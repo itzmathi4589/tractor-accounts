@@ -2,7 +2,7 @@
   "name": "டிராக்டர் கணக்கு - Tractor Accounts",
   "short_name": "டிராக்டர்",
   "description": "Tractor work accounts manager for agriculture",
-  "start_url": "./tractor-accounts.html",
+  "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#3d2b1f",
   "theme_color": "#3d2b1f",
