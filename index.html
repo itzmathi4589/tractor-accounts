@@ -469,45 +469,77 @@
 <!-- Lump Payment Modal -->
 <div class="modal-overlay" id="lumpPayModal">
   <div class="modal">
-    <h3>💰 தொகை கட்டணம் / Lump Payment</h3>
+    <h3>💰 கட்டணம் பெறு / Receive Payment</h3>
     <div id="lumpFarmerName" style="font-size:1rem;font-weight:800;color:var(--earth);margin-bottom:12px;"></div>
 
-    <div class="row2">
-      <div>
-        <label>தொடக்க தேதி / From</label>
-        <input type="date" id="lumpFrom" oninput="calcLumpTotal()">
-      </div>
-      <div>
-        <label>இறுதி தேதி / To</label>
-        <input type="date" id="lumpTo" oninput="calcLumpTotal()">
-      </div>
+    <!-- Payment type toggle -->
+    <div style="display:flex;gap:8px;margin-bottom:14px;">
+      <button class="rep-type-btn active" id="payTypeRandom" onclick="setPayType('random')">
+        💵 தனிப்பட்ட கட்டணம்<br><small>Random Payment</small>
+      </button>
+      <button class="rep-type-btn" id="payTypeBill" onclick="setPayType('bill')">
+        🧾 பில் பார்த்து கட்டணம்<br><small>After Bill</small>
+      </button>
     </div>
 
-    <!-- Summary of entries in range -->
-    <div id="lumpSummary" style="background:#fdf0d8;border-radius:12px;padding:12px;margin-bottom:12px;display:none;">
-      <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
-        <span style="font-size:0.8rem;color:var(--clay);font-weight:600;">மொத்த வேலை / Total Work</span>
-        <span id="lumpTotalAmt" style="font-weight:800;color:var(--earth);">₹0</span>
+    <!-- Payment date (both modes) -->
+    <label>கட்டணம் தேதி / Payment Date <span style="color:#bbb;font-weight:400;">(optional)</span></label>
+    <input type="date" id="lumpPayDate">
+
+    <!-- Random payment: just amount, no date range needed -->
+    <div id="randomPaySection">
+      <div style="background:#fdf0d8;border-radius:12px;padding:12px;margin-bottom:12px;">
+        <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
+          <span style="font-size:0.8rem;color:var(--clay);font-weight:600;">மொத்த பாக்கி / Total Due</span>
+          <span id="randomTotalDue" style="font-weight:800;color:var(--red);">₹0</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;">
+          <span style="font-size:0.8rem;color:var(--green);font-weight:600;">ஏற்கனவே பெற்றது / Already Paid</span>
+          <span id="randomAlreadyPaid" style="font-weight:800;color:var(--green);">₹0</span>
+        </div>
       </div>
-      <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
-        <span style="font-size:0.8rem;color:var(--green);font-weight:600;">ஏற்கனவே பெற்றது / Already Paid</span>
-        <span id="lumpAlreadyPaid" style="font-weight:800;color:var(--green);">₹0</span>
-      </div>
-      <div style="display:flex;justify-content:space-between;padding-top:8px;border-top:1px dashed var(--wheat);">
-        <span style="font-size:0.88rem;color:var(--red);font-weight:700;">பாக்கி தொகை / Balance Due</span>
-        <span id="lumpDueAmt" style="font-weight:800;font-size:1.1rem;color:var(--red);">₹0</span>
-      </div>
-      <div id="lumpEntryList" style="margin-top:10px;font-size:0.75rem;color:#888;"></div>
+      <label>இப்போது செலுத்திய தொகை / Amount Paying Now (₹)</label>
+      <input type="number" id="randomPayAmt" placeholder="0" min="0">
     </div>
 
-    <div id="lumpNoEntries" style="display:none;text-align:center;color:#bbb;padding:12px;font-size:0.85rem;">
-      இந்த காலத்தில் பதிவுகள் இல்லை / No entries in this range
+    <!-- Bill-based payment: date range + summary -->
+    <div id="billPaySection" style="display:none;">
+      <div class="row2">
+        <div>
+          <label>தொடக்க தேதி / From</label>
+          <input type="date" id="lumpFrom" oninput="calcLumpTotal()">
+        </div>
+        <div>
+          <label>இறுதி தேதி / To</label>
+          <input type="date" id="lumpTo" oninput="calcLumpTotal()">
+        </div>
+      </div>
+
+      <div id="lumpSummary" style="background:#fdf0d8;border-radius:12px;padding:12px;margin-bottom:12px;display:none;">
+        <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
+          <span style="font-size:0.8rem;color:var(--clay);font-weight:600;">மொத்த வேலை / Total Work</span>
+          <span id="lumpTotalAmt" style="font-weight:800;color:var(--earth);">₹0</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
+          <span style="font-size:0.8rem;color:var(--green);font-weight:600;">ஏற்கனவே பெற்றது / Already Paid</span>
+          <span id="lumpAlreadyPaid" style="font-weight:800;color:var(--green);">₹0</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding-top:8px;border-top:1px dashed var(--wheat);">
+          <span style="font-size:0.88rem;color:var(--red);font-weight:700;">பாக்கி தொகை / Balance Due</span>
+          <span id="lumpDueAmt" style="font-weight:800;font-size:1.1rem;color:var(--red);">₹0</span>
+        </div>
+        <div id="lumpEntryList" style="margin-top:10px;font-size:0.75rem;color:#888;"></div>
+      </div>
+
+      <div id="lumpNoEntries" style="display:none;text-align:center;color:#bbb;padding:12px;font-size:0.85rem;">
+        இந்த காலத்தில் பதிவுகள் இல்லை / No entries in this range
+      </div>
+
+      <label>செலுத்திய தொகை / Amount Now Paying (₹)</label>
+      <input type="number" id="lumpPayAmt" placeholder="0" min="0">
     </div>
 
-    <label>செலுத்திய தொகை / Amount Now Paying (₹)</label>
-    <input type="number" id="lumpPayAmt" placeholder="0" min="0">
-
-    <div style="display:flex;gap:10px;margin-top:4px;">
+    <div style="display:flex;gap:10px;margin-top:8px;">
       <button class="btn btn-green" onclick="confirmLumpPayment()">✅ சேமி / Confirm</button>
       <button class="btn" style="background:#eee;" onclick="closeLumpModal()">❌ ரத்து / Cancel</button>
     </div>
@@ -1173,16 +1205,39 @@ function farmerEntryRow(e) {
   </div>`;
 }
 
-// ---- LUMP PAYMENT ----
+// ---- LUMP / FLEXIBLE PAYMENT ----
 let lumpFarmer = '';
+let currentPayType = 'random';
+
+function setPayType(type) {
+  currentPayType = type;
+  document.getElementById('payTypeRandom').classList.toggle('active', type === 'random');
+  document.getElementById('payTypeBill').classList.toggle('active', type === 'bill');
+  document.getElementById('randomPaySection').style.display = type === 'random' ? 'block' : 'none';
+  document.getElementById('billPaySection').style.display   = type === 'bill'   ? 'block' : 'none';
+  if (type === 'bill') calcLumpTotal();
+}
 
 function openLumpModal(farmer, from, to) {
   lumpFarmer = farmer;
   document.getElementById('lumpFarmerName').textContent = '👤 ' + farmer;
-  document.getElementById('lumpFrom').value = from || '';
-  document.getElementById('lumpTo').value   = to   || '';
-  document.getElementById('lumpPayAmt').value = '';
-  calcLumpTotal();
+  document.getElementById('lumpPayDate').value = today();
+  document.getElementById('lumpFrom').value    = from || '';
+  document.getElementById('lumpTo').value      = to   || '';
+  document.getElementById('lumpPayAmt').value  = '';
+  document.getElementById('randomPayAmt').value = '';
+
+  // Default to bill mode if dates given, random otherwise
+  const startType = (from && to) ? 'bill' : 'random';
+  setPayType(startType);
+
+  // Pre-fill random section totals
+  const allDue  = entries.filter(e => e.farmer.toLowerCase() === farmer.toLowerCase() && (e.amount - e.paid) > 0).reduce((s,e) => s+(e.amount-e.paid), 0);
+  const allPaid = entries.filter(e => e.farmer.toLowerCase() === farmer.toLowerCase()).reduce((s,e) => s+e.paid, 0);
+  document.getElementById('randomTotalDue').textContent    = '₹' + allDue.toFixed(0);
+  document.getElementById('randomAlreadyPaid').textContent = '₹' + allPaid.toFixed(0);
+
+  if (startType === 'bill') calcLumpTotal();
   document.getElementById('lumpPayModal').classList.add('open');
 }
 
@@ -1192,10 +1247,10 @@ function closeLumpModal() {
 }
 
 function calcLumpTotal() {
-  const from = document.getElementById('lumpFrom').value;
-  const to   = document.getElementById('lumpTo').value;
-  const sumEl   = document.getElementById('lumpSummary');
-  const noneEl  = document.getElementById('lumpNoEntries');
+  const from  = document.getElementById('lumpFrom').value;
+  const to    = document.getElementById('lumpTo').value;
+  const sumEl  = document.getElementById('lumpSummary');
+  const noneEl = document.getElementById('lumpNoEntries');
 
   if (!from || !to || !lumpFarmer) { sumEl.style.display='none'; noneEl.style.display='none'; return; }
 
@@ -1204,25 +1259,21 @@ function calcLumpTotal() {
     e.date >= from && e.date <= to
   );
 
-  if (!relevant.length) {
-    sumEl.style.display = 'none';
-    noneEl.style.display = 'block';
-    return;
-  }
+  if (!relevant.length) { sumEl.style.display='none'; noneEl.style.display='block'; return; }
 
-  const totalAmt  = relevant.reduce((s,e) => s + e.amount, 0);
-  const totalPaid = relevant.reduce((s,e) => s + e.paid, 0);
+  const totalAmt  = relevant.reduce((s,e) => s+e.amount, 0);
+  const totalPaid = relevant.reduce((s,e) => s+e.paid,   0);
   const totalDue  = totalAmt - totalPaid;
 
   document.getElementById('lumpTotalAmt').textContent    = '₹' + totalAmt.toFixed(0);
   document.getElementById('lumpAlreadyPaid').textContent = '₹' + totalPaid.toFixed(0);
   document.getElementById('lumpDueAmt').textContent      = '₹' + totalDue.toFixed(0);
+  document.getElementById('lumpPayAmt').value            = totalDue > 0 ? totalDue.toFixed(0) : '';
 
-  // Show entry-by-entry mini list
   document.getElementById('lumpEntryList').innerHTML = relevant
     .sort((a,b) => a.date.localeCompare(b.date))
     .map(e => {
-      const wt = WORK_TYPES.find(w => w.id === e.workId);
+      const wt  = WORK_TYPES.find(w => w.id === e.workId);
       const due = e.amount - e.paid;
       return `<div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px dashed #e0d0b8;">
         <span>${formatDate(e.date)} • ${wt ? wt.ta : e.workId}</span>
@@ -1230,46 +1281,74 @@ function calcLumpTotal() {
       </div>`;
     }).join('');
 
-  // Pre-fill pay amount with total due
-  document.getElementById('lumpPayAmt').value = totalDue > 0 ? totalDue.toFixed(0) : '';
-
   sumEl.style.display  = 'block';
   noneEl.style.display = 'none';
 }
 
 function confirmLumpPayment() {
-  const from   = document.getElementById('lumpFrom').value;
-  const to     = document.getElementById('lumpTo').value;
-  const paying = parseFloat(document.getElementById('lumpPayAmt').value);
+  const payDate = document.getElementById('lumpPayDate').value;
 
-  if (!from || !to)         return showToast('தேதி தேர்வு செய்யவும் / Select dates');
-  if (!paying || paying<=0) return showToast('தொகை உள்ளிடவும் / Enter amount');
+  if (currentPayType === 'random') {
+    // Random payment — apply to oldest pending entries across ALL dates
+    const paying = parseFloat(document.getElementById('randomPayAmt').value);
+    if (!paying || paying <= 0) return showToast('தொகை உள்ளிடவும் / Enter amount');
 
-  const relevant = entries.filter(e =>
-    e.farmer.toLowerCase() === lumpFarmer.toLowerCase() &&
-    e.date >= from && e.date <= to &&
-    (e.amount - e.paid) > 0
-  ).sort((a,b) => a.date.localeCompare(b.date)); // oldest first
+    const pending = entries.filter(e =>
+      e.farmer.toLowerCase() === lumpFarmer.toLowerCase() &&
+      (e.amount - e.paid) > 0
+    ).sort((a,b) => a.date.localeCompare(b.date));
 
-  if (!relevant.length) return showToast('பாக்கி பதிவுகள் இல்லை / No pending entries');
+    if (!pending.length) return showToast('பாக்கி பதிவுகள் இல்லை / No pending entries');
 
-  let remaining = paying;
-  for (const e of relevant) {
-    if (remaining <= 0) break;
-    const due = e.amount - e.paid;
-    const apply = Math.min(due, remaining);
-    e.paid += apply;
-    remaining -= apply;
+    let remaining = paying;
+    const affected = [];
+    for (const e of pending) {
+      if (remaining <= 0) break;
+      const due   = e.amount - e.paid;
+      const apply = Math.min(due, remaining);
+      e.paid     += apply;
+      remaining  -= apply;
+      affected.push(e);
+    }
+    save();
+    affected.forEach(e => queueSync('updatePayment', { id: e.id, paid: e.paid, farmer: e.farmer, payDate }));
+    closeLumpModal();
+    showToast(`✅ ₹${paying.toFixed(0)} பதிவாயிற்று / Payment recorded!`);
+    renderRecords();
+    generateReport();
+
+  } else {
+    // Bill-based payment — apply within date range
+    const from   = document.getElementById('lumpFrom').value;
+    const to     = document.getElementById('lumpTo').value;
+    const paying = parseFloat(document.getElementById('lumpPayAmt').value);
+
+    if (!from || !to)         return showToast('தேதி தேர்வு செய்யவும் / Select dates');
+    if (!paying || paying<=0) return showToast('தொகை உள்ளிடவும் / Enter amount');
+
+    const relevant = entries.filter(e =>
+      e.farmer.toLowerCase() === lumpFarmer.toLowerCase() &&
+      e.date >= from && e.date <= to &&
+      (e.amount - e.paid) > 0
+    ).sort((a,b) => a.date.localeCompare(b.date));
+
+    if (!relevant.length) return showToast('பாக்கி பதிவுகள் இல்லை / No pending entries');
+
+    let remaining = paying;
+    for (const e of relevant) {
+      if (remaining <= 0) break;
+      const due   = e.amount - e.paid;
+      const apply = Math.min(due, remaining);
+      e.paid     += apply;
+      remaining  -= apply;
+    }
+    save();
+    relevant.forEach(e => queueSync('updatePayment', { id: e.id, paid: e.paid, farmer: e.farmer, payDate }));
+    closeLumpModal();
+    showToast(`✅ ₹${paying.toFixed(0)} பதிவாயிற்று / Payment recorded!`);
+    renderRecords();
+    generateReport();
   }
-
-  save();
-  // Queue sync for all affected entries
-  relevant.forEach(e => queueSync('updatePayment', { id: e.id, paid: e.paid, farmer: e.farmer }));
-  closeLumpModal();
-  showToast('✅ கட்டணம் பதிவாயிற்று / Lump payment recorded!');
-  renderRecords();
-  // Re-generate report if visible
-  generateReport();
 }
 
 // ---- DOWNLOAD / PRINT ----
